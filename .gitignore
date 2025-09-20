@@ -1,0 +1,117 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+
+# -----------------------------------------
+# Java
+# -----------------------------------------
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.ear
+
+# Directorios generados
+/bin/
+/target/
+/out/
+/build/
+/dist/
+/generated/
+
+# Archivos de paquetes y cachés
+*.iml
+*.ipr
+*.iws
+*.idea/
+*.project
+*.classpath
+*.settings/
+*.factorypath
+
+# -----------------------------------------
+# Spring Boot
+# -----------------------------------------
+# Logs
+logs/
+*.log
+
+# Configuraciones sensibles
+application-*.yml
+application-*.yaml
+application-*.properties
+.env
+
+# Cache de Spring
+.springBeans
+
+# -----------------------------------------
+# Gradle
+# -----------------------------------------
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Archivos de estado
+gradle-app.setting
+
+# Wrapper distribuciones
+.gradle/
+.gradle-cache/
+*/.gradle/
+
+# -----------------------------------------
+# Sistema operativo
+# -----------------------------------------
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# -----------------------------------------
+# Otros
+# -----------------------------------------
+.vscode/
+.idea/
+
