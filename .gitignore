@@ -115,3 +115,12 @@ desktop.ini
 .vscode/
 .idea/
 
+.env
+
+application.properties
+application.yml
+application-*.yml
+application-*.yaml
+application-*.properties
+.env
+
