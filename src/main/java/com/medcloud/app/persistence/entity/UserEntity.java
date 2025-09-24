@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +17,7 @@ import java.util.Set;
                 @Index(name="ix_user_email", columnList="email", unique=true)
         }
 )
+
 public class UserEntity extends BaseId{
     @NotBlank
     @Size(max=60)
@@ -44,4 +47,37 @@ public class UserEntity extends BaseId{
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private PatientEntity patientProfile;
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
 }
