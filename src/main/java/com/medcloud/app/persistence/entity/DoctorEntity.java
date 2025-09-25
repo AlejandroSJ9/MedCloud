@@ -5,8 +5,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Setter
+@Getter
 @Table(name="doctors")
 public class DoctorEntity extends BaseId{
     @OneToOne(optional=false)

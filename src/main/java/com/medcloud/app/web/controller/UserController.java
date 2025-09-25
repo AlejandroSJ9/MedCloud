@@ -1,5 +1,7 @@
 package com.medcloud.app.web.controller;
 
+import com.medcloud.app.domain.dto.UserRequestCreate;
+import com.medcloud.app.domain.dto.UserResponse;
 import com.medcloud.app.domain.service.UserService;
 import com.medcloud.app.persistence.entity.UserEntity;
 import org.apache.catalina.User;
@@ -27,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<UserEntity> save(@RequestBody UserEntity user){
-        return ResponseEntity.status(HttpStatus.CONTINUE).body(this.userService.save(user));
+    public ResponseEntity<UserResponse> save(@RequestBody UserRequestCreate user){
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.save(user));
     }
 }

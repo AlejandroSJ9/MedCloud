@@ -1,5 +1,6 @@
 package com.medcloud.app.persistence.repositoryimp;
 
+import com.medcloud.app.domain.dto.UserResponse;
 import com.medcloud.app.domain.exeptions.UserAlreadyExistException;
 import com.medcloud.app.domain.repository.UserRepository;
 import com.medcloud.app.persistence.entity.UserEntity;
@@ -21,7 +22,7 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public UserEntity save(UserEntity toSave) {
-        if (!this.jpaUser.existsById(toSave.getId())){
+        if (this.jpaUser.existsByEmail(toSave.getEmail())){
             throw new UserAlreadyExistException("User already exist");
         }
 
@@ -48,5 +49,9 @@ public class UserRepositoryImp implements UserRepository {
         return false;
     }
 
+    @Override
+    public boolean existByEmail(String email) {
+        return this.jpaUser.existsByEmail(email);
+    }
 }
 
