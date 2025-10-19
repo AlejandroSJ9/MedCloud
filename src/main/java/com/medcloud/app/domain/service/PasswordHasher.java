@@ -1,6 +1,6 @@
 package com.medcloud.app.domain.service;
 
-import com.medcloud.app.domain.exeptions.WeakPasswordException;
+import com.medcloud.app.domain.exceptions.WeakPasswordException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
