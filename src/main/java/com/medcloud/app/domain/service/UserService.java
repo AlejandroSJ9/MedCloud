@@ -3,7 +3,7 @@ package com.medcloud.app.domain.service;
 import com.medcloud.app.domain.dto.UserRequestCreate;
 import com.medcloud.app.domain.dto.UserResponse;
 import com.medcloud.app.domain.enums.RoleName;
-import com.medcloud.app.domain.exeptions.UserAlreadyExistException;
+import com.medcloud.app.domain.exceptions.UserAlreadyExistException;
 import com.medcloud.app.persistence.entity.DoctorEntity;
 import com.medcloud.app.persistence.entity.PatientEntity;
 import com.medcloud.app.persistence.entity.UserEntity;

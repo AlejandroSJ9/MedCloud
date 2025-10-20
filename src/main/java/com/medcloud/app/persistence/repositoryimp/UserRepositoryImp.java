@@ -1,7 +1,6 @@
 package com.medcloud.app.persistence.repositoryimp;
 
-import com.medcloud.app.domain.dto.UserResponse;
-import com.medcloud.app.domain.exeptions.UserAlreadyExistException;
+import com.medcloud.app.domain.exceptions.UserAlreadyExistException;
 import com.medcloud.app.domain.repository.UserRepository;
 import com.medcloud.app.persistence.entity.UserEntity;
 import com.medcloud.app.persistence.jpa.JpaUser;
