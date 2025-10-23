@@ -4,6 +4,7 @@ import com.medcloud.app.domain.enums.DocumentKind;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Value;
 
@@ -14,9 +15,11 @@ import lombok.Value;
 public class ClinicalDocumentCreateRequest {
 
     @NotBlank(message = "El ID del paciente es requerido.")
+    @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "El ID del paciente debe ser un UUID válido.")
     String patientId;
 
     @NotBlank(message = "El ID del usuario que sube es requerido.")
+    @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "El ID del usuario debe ser un UUID válido.")
     String uploadedByUserId;
 
     @NotNull(message = "El tipo de documento es requerido.")

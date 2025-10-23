@@ -2,6 +2,7 @@ package com.medcloud.app.domain.service;
 
 import com.medcloud.app.domain.dto.ClinicalDocumentCreateRequest;
 import com.medcloud.app.domain.dto.ClinicalDocumentDto;
+import com.medcloud.app.domain.exceptions.InvalidUuidException;
 import com.medcloud.app.domain.exceptions.ResourceNotFoundException;
 import com.medcloud.app.persistence.mapper.ClinicalDocumentMapper;
 import com.medcloud.app.persistence.entity.ClinicalDocument;
@@ -51,8 +52,14 @@ public class ClinicalDocumentServiceImpl {
         String patientIdString = requestDto.getPatientId().toLowerCase();
         String userIdString = requestDto.getUploadedByUserId().toLowerCase();
 
-        UUID patientUuid = UUID.fromString(patientIdString);
-        UUID userUuid = UUID.fromString(userIdString);
+        UUID patientUuid;
+        UUID userUuid;
+        try {
+            patientUuid = UUID.fromString(patientIdString);
+            userUuid = UUID.fromString(userIdString);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidUuidException("UUID inválido proporcionado: " + e.getMessage());
+        }
 
         // 🚨 CAMBIO DE ESTRATEGIA: Uso de EntityManager.find() para forzar la lectura DB.
         // Esto ignora el caché de nivel 1 de Hibernate que podría estar obsoleto.
@@ -90,7 +97,12 @@ public class ClinicalDocumentServiceImpl {
      * Obtiene un documento clínico por su ID.
      */
     public ClinicalDocumentDto getDocumentById(String idString) {
-        UUID uuid = UUID.fromString(idString);
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(idString);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidUuidException("UUID inválido proporcionado: " + e.getMessage());
+        }
 
         ClinicalDocument document = documentRepository.findById(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Documento clínico con ID " + idString + " no encontrado."));
@@ -102,7 +114,12 @@ public class ClinicalDocumentServiceImpl {
      * Obtiene todos los documentos clínicos asociados a un paciente.
      */
     public List<ClinicalDocumentDto> getDocumentsByPatientId(String patientIdString) {
-        UUID patientUuid = UUID.fromString(patientIdString);
+        UUID patientUuid;
+        try {
+            patientUuid = UUID.fromString(patientIdString);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidUuidException("UUID inválido proporcionado: " + e.getMessage());
+        }
 
         List<ClinicalDocument> documents = documentRepository.findByPatientId(patientUuid);
 
