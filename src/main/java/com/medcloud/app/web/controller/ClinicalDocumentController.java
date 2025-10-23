@@ -17,7 +17,7 @@ import java.util.List;
  * Inyecta la implementación del servicio (según solicitud).
  */
 @RestController
-@RequestMapping("/v1/clinical-documents")
+@RequestMapping("/clinical-documents")
 @RequiredArgsConstructor
 public class ClinicalDocumentController {
 
