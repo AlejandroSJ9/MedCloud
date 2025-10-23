@@ -22,8 +22,8 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<UserEntity>> getAll(){
-        List<UserEntity> list = this.userService.getAll();
+    public ResponseEntity<List<UserResponse>> getAll(){
+        List<UserResponse> list = this.userService.getAll();
         System.out.println("in controller from service: " + list.toString());
         return ResponseEntity.ok(userService.getAll());
     }

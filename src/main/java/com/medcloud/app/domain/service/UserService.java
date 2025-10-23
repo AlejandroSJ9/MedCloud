@@ -12,6 +12,7 @@ import com.medcloud.app.persistence.repositoryimp.UserRepositoryImp;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -26,10 +27,10 @@ public class UserService {
         this.passwordHasher = passwordHasher;
     }
 
-    public List<UserEntity> getAll(){
+    public List<UserResponse> getAll(){
         List<UserEntity> list = this.userRepositoryImp.findAll();
         System.out.println("in service from: repository" + list.toString());
-        return this.userRepositoryImp.findAll();
+        return list.stream().map(userMapper::toResponse).collect(Collectors.toList());
     }
 
     public UserResponse save(UserRequestCreate request){
