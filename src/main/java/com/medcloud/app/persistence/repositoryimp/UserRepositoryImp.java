@@ -52,5 +52,18 @@ public class UserRepositoryImp implements UserRepository {
     public boolean existByEmail(String email) {
         return this.jpaUser.existsByEmail(email);
     }
+
+    public Optional<UserEntity> findByEmail(String email) {
+        return this.jpaUser.findByEmail(email);
+    }
+
+    public Optional<UserEntity> findByUsername(String username) {
+        return this.jpaUser.findByUsername(username);
+    }
+
+    @Override
+    public Optional<UserEntity> findByDocumentNumber(String documentNumber) {
+        return this.jpaUser.findByDocumentNumber(documentNumber);
+    }
 }
 

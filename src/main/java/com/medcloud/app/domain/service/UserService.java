@@ -12,6 +12,7 @@ import com.medcloud.app.persistence.repositoryimp.UserRepositoryImp;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,22 +42,21 @@ public class UserService {
         UserEntity userBase = userMapper.toEntity(request);
         userBase.setPasswordHash(passwordHasher.hash(request.password()));
 
-        if (request.role() == RoleName.DOCTOR) {
-            DoctorEntity doctor = new DoctorEntity();
-            doctor.setSpecialty(request.specialty());
-            doctor.setLicenseNumber(request.licenseNumber());
-            doctor.setUser(userBase);
-            userBase.setDoctorProfile(doctor);
-
-        } else if (request.role() == RoleName.PACIENTE) {
+        if (request.role() == RoleName.PACIENTE) {
             PatientEntity patient = new PatientEntity();
             patient.setUser(userBase);
             userBase.setPatientProfile(patient);
+        } else if (request.role() == RoleName.EPS) {
+            // EPS no necesita perfil adicional por ahora
         }
 
         UserEntity toSave = this.userRepositoryImp.save(userBase);
         return this.userMapper.toResponse(toSave);
 
+    }
+
+    public Optional<UserEntity> findByDocumentNumber(String documentNumber) {
+        return this.userRepositoryImp.findByDocumentNumber(documentNumber);
     }
 
 
