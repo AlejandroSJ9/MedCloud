@@ -7,6 +7,7 @@ public record EpsValidationResponseDTO(
         boolean isValid,
         String epsName,
         String numeroDocumento,
+        String status,
         String message
 ) {
 }

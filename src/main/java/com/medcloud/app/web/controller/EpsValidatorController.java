@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/validation/eps")
 @RequiredArgsConstructor
-public class EpsValidator {
+public class EpsValidatorController {
 
     private final AdresValidationService adresValidationService;
 
@@ -55,7 +55,7 @@ public class EpsValidator {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // In case of unexpected errors, return a generic error response
-            EpsValidationResponseDTO errorResponse = new EpsValidationResponseDTO(false, null, null, "Internal server error: " + e.getMessage());
+            EpsValidationResponseDTO errorResponse = new EpsValidationResponseDTO(false, null, null, null, "Internal server error: " + e.getMessage());
             return ResponseEntity.internalServerError().body(errorResponse);
         }
     }

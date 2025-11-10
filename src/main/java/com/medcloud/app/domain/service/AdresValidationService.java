@@ -334,16 +334,7 @@ public class AdresValidationService {
             String originalUrl = driver.getCurrentUrl();
             submitButton.click();
             log.info("Form submitted, waiting for response or page change");
-            // Wait for URL change or specific elements to appear after form submission
-            try {
-                wait.until(ExpectedConditions.or(
-                        ExpectedConditions.not(ExpectedConditions.urlToBe(originalUrl)),
-                        ExpectedConditions.presenceOfElementLocated(
-                                By.cssSelector(".success, .valid, .error, .invalid, .alert-danger, .alert-success"))));
-                log.info("Page change or response elements detected after form submission");
-            } catch (Exception e) {
-                log.warn("Timeout waiting for page change or response elements, proceeding anyway: {}", e.getMessage());
-            }
+
             log.info("Current URL after submit: {}", driver.getCurrentUrl());
             log.info("Page title after submit: {}", driver.getTitle());
 
@@ -378,7 +369,7 @@ public class AdresValidationService {
                 log.error("No se encontró la tabla de resultados 'GridViewAfiliacion' a tiempo.", e);
                 // Si la tabla no aparece, asume fallo y sal del proceso.
                 // Esto es más robusto que simplemente "proceder con parsing".
-                return new EpsValidationResponseDTO(false, null, numeroDocumento,
+                return new EpsValidationResponseDTO(false, null, null, numeroDocumento,
                         "Timeout: No se encontró la tabla de resultados en la ventana emergente.");
             }
 
@@ -412,14 +403,23 @@ public class AdresValidationService {
             // Parse the response to determine if EPS is valid
             boolean isValid = parseValidationResult();
             String epsName = isValid ? extractEpsName() : null;
+            // 1. Localizar la tabla de resultados
+            WebElement gridTable = driver.findElement(By.id("GridViewAfiliacion"));
+
+            // 2. Localizar la fila de datos
+            WebElement dataRow = gridTable.findElement(By.cssSelector("tr.DataGrid_Item"));
+
+            // 3. Locali
+            WebElement statusElement = dataRow.findElements(By.tagName("td")).get(0);
+            String status = statusElement.getText().trim().toUpperCase();
             String message = isValid ? "EPS validated successfully" : "EPS validation failed";
             log.info("Validation result: isValid={}, epsName='{}', message='{}'", isValid, epsName, message);
 
             log.info("=== END DEBUGGING FORM SUBMISSION ===");
-            return new EpsValidationResponseDTO(isValid, epsName, numeroDocumento, message);
+            return new EpsValidationResponseDTO(isValid, epsName, numeroDocumento, status, message);
         } catch (Exception e) {
             log.error("Error validating EPS", e);
-            return new EpsValidationResponseDTO(false, null, null, "Error validating EPS: " + e.getMessage());
+            return new EpsValidationResponseDTO(false, null, null, null, "Error validating EPS: " + e.getMessage());
         }
     }
 
