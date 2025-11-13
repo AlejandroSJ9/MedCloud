@@ -1,14 +1,13 @@
 package com.medcloud.app.persistence.jpa;
 
-import com.medcloud.app.persistence.entity.UserEntity;
+import com.medcloud.app.persistence.entity.EpsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface JpaUser extends JpaRepository<UserEntity, UUID> {
+public interface JpaUser extends JpaRepository<EpsEntity, UUID> {
     boolean existsByEmail(String email);
-    Optional<UserEntity> findByEmail(String email);
-    Optional<UserEntity> findByUsername(String username);
-    Optional<UserEntity> findByDocumentNumber(String documentNumber);
+    Optional<EpsEntity> findByEmail(String email);
+    Optional<EpsEntity> findByUsername(String username);
 }

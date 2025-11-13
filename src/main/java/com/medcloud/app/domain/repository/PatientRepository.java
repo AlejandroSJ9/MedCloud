@@ -15,5 +15,18 @@ public interface PatientRepository {
      * @return Un Optional que contiene la entidad si se encuentra.
      */
     Optional<PatientEntity> findById(UUID uuid);
-    // Puedes añadir otros métodos de dominio aquí si son necesarios
+
+    /**
+     * Busca una entidad Patient por su número de documento (cédula).
+     * @param documentNumber El número de documento del paciente.
+     * @return Un Optional que contiene la entidad si se encuentra.
+     */
+    Optional<PatientEntity> findByDocumentNumber(String documentNumber);
+
+    /**
+     * Guarda una entidad Patient.
+     * @param patient La entidad a guardar.
+     * @return La entidad guardada.
+     */
+    PatientEntity save(PatientEntity patient);
 }

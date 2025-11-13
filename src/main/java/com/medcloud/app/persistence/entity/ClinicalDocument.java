@@ -15,14 +15,17 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name="clinical_documents",
-        indexes = @Index(name="ix_doc_patient", columnList="patient_id"))
+        indexes = {
+                @Index(name="ix_doc_patient", columnList="patient_id"),
+                @Index(name="ix_doc_eps", columnList="uploaded_by_eps_id")
+        })
 public class ClinicalDocument extends BaseId{
     @ManyToOne(optional=false) @JoinColumn(name="patient_id", nullable=false)
     private PatientEntity patient;
 
-    // Quién subió el documento
-    @ManyToOne(optional=false) @JoinColumn(name="uploaded_by_user_id", nullable=false)
-    private UserEntity uploadedBy;
+    // Quién subió el documento (EPS)
+    @ManyToOne(optional=false) @JoinColumn(name="uploaded_by_eps_id", nullable=false)
+    private EpsEntity uploadedBy;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false, length=10)
@@ -44,6 +47,16 @@ public class ClinicalDocument extends BaseId{
 
     @Column(nullable=false)
     private long sizeBytes;
+
+    // Datos del médico que cargó la historia clínica
+    @Column(name = "doctor_name", nullable = false)
+    private String doctorName;
+
+    @Column(name = "doctor_document_number", nullable = false)
+    private String doctorDocumentNumber;
+
+    @Column(name = "doctor_specialty")
+    private String doctorSpecialty;
 
     @Column(nullable=false)
     private OffsetDateTime uploadedAt = OffsetDateTime.now();

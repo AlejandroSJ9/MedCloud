@@ -1,6 +1,6 @@
 package com.medcloud.app.security;
 
-import com.medcloud.app.persistence.entity.UserEntity;
+import com.medcloud.app.persistence.entity.EpsEntity;
 import com.medcloud.app.persistence.repositoryimp.UserRepositoryImp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByEmail(identifier)
+        EpsEntity user = userRepository.findByEmail(identifier)
                 .or(() -> userRepository.findByUsername(identifier))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with identifier: " + identifier));
 

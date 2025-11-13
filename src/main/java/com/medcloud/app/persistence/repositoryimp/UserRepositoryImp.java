@@ -2,7 +2,7 @@ package com.medcloud.app.persistence.repositoryimp;
 
 import com.medcloud.app.domain.exceptions.UserAlreadyExistException;
 import com.medcloud.app.domain.repository.UserRepository;
-import com.medcloud.app.persistence.entity.UserEntity;
+import com.medcloud.app.persistence.entity.EpsEntity;
 import com.medcloud.app.persistence.jpa.JpaUser;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +20,7 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
-    public UserEntity save(UserEntity toSave) {
+    public EpsEntity save(EpsEntity toSave) {
         if (this.jpaUser.existsByEmail(toSave.getEmail())){
             throw new UserAlreadyExistException("User already exist");
         }
@@ -29,12 +29,12 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID uuid) {
+    public Optional<EpsEntity> findById(UUID uuid) {
         return Optional.empty();
     }
 
     @Override
-    public List<UserEntity> findAll() {
+    public List<EpsEntity> findAll() {
         return this.jpaUser.findAll();
     }
 
@@ -53,17 +53,13 @@ public class UserRepositoryImp implements UserRepository {
         return this.jpaUser.existsByEmail(email);
     }
 
-    public Optional<UserEntity> findByEmail(String email) {
+    public Optional<EpsEntity> findByEmail(String email) {
         return this.jpaUser.findByEmail(email);
     }
 
-    public Optional<UserEntity> findByUsername(String username) {
+    public Optional<EpsEntity> findByUsername(String username) {
         return this.jpaUser.findByUsername(username);
     }
 
-    @Override
-    public Optional<UserEntity> findByDocumentNumber(String documentNumber) {
-        return this.jpaUser.findByDocumentNumber(documentNumber);
-    }
 }
 

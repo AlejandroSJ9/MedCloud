@@ -26,9 +26,10 @@ public class ClinicalDocumentController {
 
     /**
      * Sube un nuevo documento clínico.
+     * Requiere rol EPS. Si el paciente no existe, se crea automáticamente.
      */
     @PostMapping
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("hasRole('EPS')")
     public ResponseEntity<ClinicalDocumentDto> uploadDocument(@Valid @RequestBody ClinicalDocumentCreateRequest request) {
         ClinicalDocumentDto savedDocument = clinicalDocumentService.uploadDocument(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDocument);
@@ -36,21 +37,22 @@ public class ClinicalDocumentController {
 
     /**
      * Obtiene un documento clínico por su ID (UUID).
+     * Requiere rol EPS o PACIENTE.
      */
     @GetMapping("/{documentId}")
-    @PreAuthorize("hasRole('DOCTOR') or hasRole('PACIENTE')")
+    @PreAuthorize("hasRole('EPS') or hasRole('PACIENTE')")
     public ResponseEntity<ClinicalDocumentDto> getDocumentById(@PathVariable String documentId) {
         ClinicalDocumentDto document = clinicalDocumentService.getDocumentById(documentId);
         return ResponseEntity.ok(document);
     }
 
     /**
-     * Obtiene todos los documentos clínicos asociados a un paciente (por su ID UUID).
+     * Obtiene todos los documentos clínicos asociados a un paciente (por su cédula).
+     * Endpoint público para que pacientes puedan consultar sus documentos sin autenticación.
      */
-    @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasRole('DOCTOR') or hasRole('PACIENTE')")
-    public ResponseEntity<List<ClinicalDocumentDto>> getDocumentsByPatientId(@PathVariable String patientId) {
-        List<ClinicalDocumentDto> documents = clinicalDocumentService.getDocumentsByPatientId(patientId);
+    @GetMapping("/patient/{documentNumber}")
+    public ResponseEntity<List<ClinicalDocumentDto>> getDocumentsByPatientDocumentNumber(@PathVariable String documentNumber) {
+        List<ClinicalDocumentDto> documents = clinicalDocumentService.getDocumentsByPatientDocumentNumber(documentNumber);
         return ResponseEntity.ok(documents);
     }
 

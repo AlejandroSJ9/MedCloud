@@ -1,6 +1,7 @@
 package com.medcloud.app.web.controller;
 
 import com.medcloud.app.domain.exceptions.InvalidUuidException;
+import com.medcloud.app.domain.exceptions.PatientAlreadyInProgressException;
 import com.medcloud.app.domain.exceptions.ResourceNotFoundException;
 import com.medcloud.app.domain.exceptions.UserAlreadyExistException;
 import com.medcloud.app.domain.exceptions.WeakPasswordException;
@@ -50,6 +51,14 @@ public class GlobalExceptionHandler {
         error.put("error", "Bad Request");
         error.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(PatientAlreadyInProgressException.class)
+    public ResponseEntity<Map<String, String>> handlePatientAlreadyInProgress(PatientAlreadyInProgressException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Conflict");
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

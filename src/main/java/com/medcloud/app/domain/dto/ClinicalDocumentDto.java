@@ -14,7 +14,12 @@ import java.time.OffsetDateTime;
 public class ClinicalDocumentDto {
     String id;
     String patientId;
-    String uploadedByUserId;
+    String uploadedByEpsId;
+    String epsName; // Nombre de la EPS que subió el documento
+    String doctorName;
+    String doctorDocumentNumber;
+    String doctorSpecialty;
+    Boolean patientDiagnosisInProgress;
     DocumentKind kind;
     String filename;
     String fileContentBase64; // El contenido Base64 que se devuelve

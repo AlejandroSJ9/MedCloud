@@ -35,8 +35,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/patient-login", "/users/").permitAll() // Endpoints públicos
-                        .requestMatchers("/clinical-documents/**").authenticated() // Requiere autenticación
+                        .requestMatchers("/auth/login", "/auth/patient-access", "/users/").permitAll() // Endpoints públicos
+                        .requestMatchers("/clinical-documents/patient/**").permitAll() // Consulta de documentos por cédula (público)
+                        .requestMatchers("/clinical-documents/**").authenticated() // Otros endpoints requieren autenticación
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

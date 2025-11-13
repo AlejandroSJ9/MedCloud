@@ -3,8 +3,8 @@ package com.medcloud.app.persistence.mapper;
 import com.medcloud.app.domain.dto.UserRequestCreate;
 import com.medcloud.app.domain.dto.UserResponse;
 import com.medcloud.app.domain.enums.RoleName;
+import com.medcloud.app.persistence.entity.EpsEntity;
 import com.medcloud.app.persistence.entity.RoleEntity;
-import com.medcloud.app.persistence.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,19 +12,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface EpsMapper {
 
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "passwordHash", ignore = true) // se setea en el servicio
     @Mapping(target = "enabled", constant = "true")
     @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "doctorProfile", ignore = true)
-    @Mapping(target = "patientProfile", ignore = true)
-    UserEntity toEntity(UserRequestCreate request);
+    @Mapping(target = "epsName", source = "fullName")
+    @Mapping(target = "nit", ignore = true)
+    EpsEntity toEntity(UserRequestCreate request);
 
-    // UserEntity → UserResponse
-    UserResponse toResponse(UserEntity user);
+    // EpsEntity → UserResponse
+    UserResponse toResponse(EpsEntity eps);
 
 
     default Set<RoleName> mapRoles(Set<RoleEntity> roles) {

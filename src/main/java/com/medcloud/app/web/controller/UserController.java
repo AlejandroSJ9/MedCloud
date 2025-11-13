@@ -2,8 +2,8 @@ package com.medcloud.app.web.controller;
 
 import com.medcloud.app.domain.dto.UserRequestCreate;
 import com.medcloud.app.domain.dto.UserResponse;
-import com.medcloud.app.domain.service.UserService;
-import com.medcloud.app.persistence.entity.UserEntity;
+import com.medcloud.app.domain.service.EpsService;
+import com.medcloud.app.persistence.entity.EpsEntity;
 import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,9 +16,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
+    private final EpsService userService;
 
-    public UserController(UserService userService) {
+    public UserController(EpsService userService) {
         this.userService = userService;
     }
 
