@@ -49,13 +49,13 @@ public class ClinicalDocument extends BaseId{
     private long sizeBytes;
 
     // Datos del médico que cargó la historia clínica
-    @Column(name = "doctor_name", nullable = false)
+    @Column(name = "doctor_name", nullable = true)
     private String doctorName;
 
-    @Column(name = "doctor_document_number", nullable = false)
+    @Column(name = "doctor_document_number", nullable = true)
     private String doctorDocumentNumber;
 
-    @Column(name = "doctor_specialty")
+    @Column(name = "doctor_specialty", nullable = true)
     private String doctorSpecialty;
 
     @Column(nullable=false)

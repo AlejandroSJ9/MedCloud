@@ -103,10 +103,16 @@ public class ClinicalDocumentServiceImpl {
                 throw new PatientAlreadyInProgressException("El paciente ya tiene un diagnóstico en curso con otra EPS");
             }
 
-            // Actualizar datos del paciente si es necesario
-            patient.setFullName(requestDto.getPatientFullName());
-            patient.setBirthDate(requestDto.getPatientBirthDate());
-            patient.setTreatment(requestDto.getPatientTreatment());
+            // Actualizar datos del paciente si es necesario (solo si se proporcionan)
+            if (requestDto.getPatientFullName() != null) {
+                patient.setFullName(requestDto.getPatientFullName());
+            }
+            if (requestDto.getPatientBirthDate() != null) {
+                patient.setBirthDate(requestDto.getPatientBirthDate());
+            }
+            if (requestDto.getPatientTreatment() != null) {
+                patient.setTreatment(requestDto.getPatientTreatment());
+            }
             patient.setDiagnosisInProgress(requestDto.getPatientDiagnosisInProgress());
 
             return patientRepository.save(patient);
