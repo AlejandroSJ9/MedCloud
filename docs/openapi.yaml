@@ -1,0 +1,418 @@
+openapi: 3.0.0
+info:
+  title: MedCloud API
+  version: 1.0.0
+  description: API para la gestión de documentos clínicos y usuarios en la aplicación MedCloud.
+servers:
+  - url: http://localhost:8080
+    description: Servidor de desarrollo local
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      summary: Autenticar usuario
+      description: Inicia sesión de un usuario con identificador (correo electrónico o nombre de usuario) y contraseña, devolviendo un token JWT junto con el correo electrónico y el rol del usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Autenticación exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  email:
+                    type: string
+                  role:
+                    type: string
+                required:
+                  - token
+                  - email
+                  - role
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                email: "user@example.com"
+                role: "EPS"
+  /clinical-documents:
+    post:
+      operationId: createClinicalDocument
+      summary: Crear un nuevo documento clínico
+      description: Sube un nuevo documento clínico incluyendo información del paciente, detalles del médico y el contenido del documento en formato Base64. Si el paciente no existe, se crea automáticamente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClinicalDocumentCreateRequest'
+      responses:
+        '201':
+          description: Documento clínico creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicalDocumentDto'
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                patientId: "550e8400-e29b-41d4-a716-446655440001"
+                uploadedByEpsId: "550e8400-e29b-41d4-a716-446655440002"
+                epsName: "EPS Example"
+                doctorName: "Dr. John Doe"
+                doctorDocumentNumber: "123456789"
+                doctorSpecialty: "Cardiology"
+                patientDiagnosisInProgress: true
+                kind: "PDF"
+                filename: "report.pdf"
+                fileContentBase64: "JVBERi0xLjQK..."
+                mimeType: "application/pdf"
+                sizeBytes: 1024
+                uploadedAt: "2023-10-01T12:00:00Z"
+  /clinical-documents/{documentId}:
+    get:
+      operationId: getClinicalDocument
+      summary: Obtener documento clínico por ID
+      description: Recupera un documento clínico específico por su ID único, incluyendo el contenido del documento en formato Base64.
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: El ID único del documento clínico
+      responses:
+        '200':
+          description: Documento clínico recuperado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicalDocumentDto'
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                patientId: "550e8400-e29b-41d4-a716-446655440001"
+                uploadedByEpsId: "550e8400-e29b-41d4-a716-446655440002"
+                epsName: "EPS Example"
+                doctorName: "Dr. John Doe"
+                doctorDocumentNumber: "123456789"
+                doctorSpecialty: "Cardiology"
+                patientDiagnosisInProgress: true
+                kind: "PDF"
+                filename: "report.pdf"
+                fileContentBase64: "JVBERi0xLjQK..."
+                mimeType: "application/pdf"
+                sizeBytes: 1024
+                uploadedAt: "2023-10-01T12:00:00Z"
+  /clinical-documents/patient/{documentNumber}:
+    get:
+      operationId: getClinicalDocumentsByPatient
+      summary: Obtener documentos clínicos por número de documento del paciente
+      description: Recupera una lista de todos los documentos clínicos asociados con un paciente identificado por su número de documento.
+      parameters:
+        - name: documentNumber
+          in: path
+          required: true
+          schema:
+            type: string
+          description: El número de documento del paciente
+      responses:
+        '200':
+          description: Lista de documentos clínicos recuperada exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClinicalDocumentDto'
+              example:
+                - id: "550e8400-e29b-41d4-a716-446655440000"
+                  patientId: "550e8400-e29b-41d4-a716-446655440001"
+                  uploadedByEpsId: "550e8400-e29b-41d4-a716-446655440002"
+                  epsName: "EPS Example"
+                  doctorName: "Dr. John Doe"
+                  doctorDocumentNumber: "123456789"
+                  doctorSpecialty: "Cardiology"
+                  patientDiagnosisInProgress: true
+                  kind: "PDF"
+                  filename: "report.pdf"
+                  fileContentBase64: "JVBERi0xLjQK..."
+                  mimeType: "application/pdf"
+                  sizeBytes: 1024
+                  uploadedAt: "2023-10-01T12:00:00Z"
+  /users:
+    get:
+      operationId: getUsers
+      summary: Obtener todos los usuarios
+      description: Recupera una lista de todos los usuarios en el sistema, incluyendo sus perfiles y roles.
+      responses:
+        '200':
+          description: Lista de usuarios recuperada exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+              example:
+                - id: "550e8400-e29b-41d4-a716-446655440003"
+                  username: "johndoe"
+                  email: "john.doe@example.com"
+                  roles: ["EPS"]
+                  documentType: "CC"
+                  documentNumber: "123456789"
+                  fullName: "John Doe"
+                  birthDate: "1980-01-01"
+                  doctorProfile:
+                    specialty: "Cardiology"
+                    licenseNumber: "LIC123"
+                  patientProfile:
+                    weight: 70
+    post:
+      operationId: createUser
+      summary: Crear un nuevo usuario
+      description: Crea un nuevo usuario con la información proporcionada, incluyendo nombre de usuario, correo electrónico, contraseña, rol y detalles personales.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequestCreate'
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440003"
+                username: "johndoe"
+                email: "john.doe@example.com"
+                roles: ["EPS"]
+                documentType: "CC"
+                documentNumber: "123456789"
+                fullName: "John Doe"
+                birthDate: "1980-01-01"
+                doctorProfile:
+                  specialty: "Cardiology"
+                  licenseNumber: "LIC123"
+                patientProfile:
+                  weight: 70
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Correo electrónico o nombre de usuario para iniciar sesión
+        password:
+          type: string
+          format: password
+      required:
+        - identifier
+        - password
+    ClinicalDocumentCreateRequest:
+      type: object
+      properties:
+        patientDocumentNumber:
+          type: string
+        patientFullName:
+          type: string
+          maxLength: 120
+        patientBirthDate:
+          type: string
+          format: date
+        patientTreatment:
+          type: string
+          maxLength: 1000
+        patientDiagnosisInProgress:
+          type: boolean
+        uploadedByEpsId:
+          type: string
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        doctorName:
+          type: string
+          maxLength: 120
+        doctorDocumentNumber:
+          type: string
+        doctorSpecialty:
+          type: string
+          maxLength: 60
+        kind:
+          $ref: '#/components/schemas/DocumentKind'
+        filename:
+          type: string
+          maxLength: 200
+        fileContentBase64:
+          type: string
+        mimeType:
+          type: string
+          maxLength: 120
+        sizeBytes:
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+        - patientDocumentNumber
+        - patientFullName
+        - patientBirthDate
+        - patientDiagnosisInProgress
+        - uploadedByEpsId
+        - doctorName
+        - doctorDocumentNumber
+        - kind
+        - filename
+        - fileContentBase64
+        - sizeBytes
+    ClinicalDocumentDto:
+      type: object
+      properties:
+        id:
+          type: string
+        patientId:
+          type: string
+        uploadedByEpsId:
+          type: string
+        epsName:
+          type: string
+        doctorName:
+          type: string
+        doctorDocumentNumber:
+          type: string
+        doctorSpecialty:
+          type: string
+        patientDiagnosisInProgress:
+          type: boolean
+        kind:
+          $ref: '#/components/schemas/DocumentKind'
+        filename:
+          type: string
+        fileContentBase64:
+          type: string
+        mimeType:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        uploadedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - patientId
+        - uploadedByEpsId
+        - epsName
+        - doctorName
+        - doctorDocumentNumber
+        - doctorSpecialty
+        - patientDiagnosisInProgress
+        - kind
+        - filename
+        - fileContentBase64
+        - mimeType
+        - sizeBytes
+        - uploadedAt
+    UserRequestCreate:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        role:
+          $ref: '#/components/schemas/RoleName'
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        documentNumber:
+          type: string
+        fullName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        weight:
+          type: integer
+          format: int32
+      required:
+        - username
+        - email
+        - password
+        - role
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleName'
+        documentType:
+          type: string
+        documentNumber:
+          type: string
+        fullName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        doctorProfile:
+          $ref: '#/components/schemas/DoctorResponse'
+        patientProfile:
+          $ref: '#/components/schemas/PatientResponse'
+      required:
+        - id
+        - username
+        - email
+        - roles
+        - documentType
+        - documentNumber
+        - fullName
+        - birthDate
+    DoctorResponse:
+      type: object
+      properties:
+        specialty:
+          type: string
+        licenseNumber:
+          type: string
+    PatientResponse:
+      type: object
+      properties:
+        weight:
+          type: integer
+          format: int32
+    DocumentKind:
+      type: string
+      enum:
+        - PDF
+        - IMAGE
+        - LAB_REPORT
+        - SCAN
+        - OTHER
+    DocumentType:
+      type: string
+      enum:
+        - CC
+        - TI
+        - CE
+    RoleName:
+      type: string
+      enum:
+        - PACIENTE
+        - EPS

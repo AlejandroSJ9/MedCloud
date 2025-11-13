@@ -4,20 +4,50 @@ import com.medcloud.app.domain.enums.DocumentKind;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Value;
 
+import java.time.LocalDate;
+
 /**
  * DTO de entrada (Request) para la subida de un nuevo documento usando Base64.
+ * Ahora incluye datos del paciente para crearlo automáticamente si no existe.
  */
 @Value
 public class ClinicalDocumentCreateRequest {
 
-    @NotBlank(message = "El ID del paciente es requerido.")
-    String patientId;
+    // Datos del paciente (para crear si no existe)
+    @NotBlank(message = "La cédula del paciente es requerida.")
+    String patientDocumentNumber;
 
-    @NotBlank(message = "El ID del usuario que sube es requerido.")
-    String uploadedByUserId;
+    @NotBlank(message = "El nombre completo del paciente es requerido.")
+    @Size(max=120, message = "El nombre no puede exceder los 120 caracteres.")
+    String patientFullName;
+
+    @NotNull(message = "La fecha de nacimiento del paciente es requerida.")
+    LocalDate patientBirthDate;
+
+    @Size(max=1000, message = "El tratamiento no puede exceder los 1000 caracteres.")
+    String patientTreatment;
+
+    @NotNull(message = "El estado del diagnóstico es requerido.")
+    Boolean patientDiagnosisInProgress;
+
+    @NotBlank(message = "El ID de la EPS que sube es requerido.")
+    @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", flags = Pattern.Flag.CASE_INSENSITIVE, message = "El ID de la EPS debe ser un UUID válido.")
+    String uploadedByEpsId;
+
+    // Datos del médico que carga la historia clínica
+    @NotBlank(message = "El nombre del médico es requerido.")
+    @Size(max=120, message = "El nombre del médico no puede exceder los 120 caracteres.")
+    String doctorName;
+
+    @NotBlank(message = "La cédula del médico es requerida.")
+    String doctorDocumentNumber;
+
+    @Size(max=60, message = "La especialidad del médico no puede exceder los 60 caracteres.")
+    String doctorSpecialty;
 
     @NotNull(message = "El tipo de documento es requerido.")
     DocumentKind kind;
