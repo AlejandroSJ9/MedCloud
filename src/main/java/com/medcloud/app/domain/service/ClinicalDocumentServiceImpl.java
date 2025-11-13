@@ -3,21 +3,22 @@ package com.medcloud.app.domain.service;
 import com.medcloud.app.domain.dto.ClinicalDocumentCreateRequest;
 import com.medcloud.app.domain.dto.ClinicalDocumentDto;
 import com.medcloud.app.domain.exceptions.InvalidUuidException;
+import com.medcloud.app.domain.exceptions.PatientAlreadyInProgressException;
 import com.medcloud.app.domain.exceptions.ResourceNotFoundException;
 import com.medcloud.app.persistence.mapper.ClinicalDocumentMapper;
 import com.medcloud.app.persistence.entity.ClinicalDocument;
 import com.medcloud.app.persistence.entity.PatientEntity;
-import com.medcloud.app.persistence.entity.UserEntity;
+import com.medcloud.app.persistence.entity.EpsEntity;
 import com.medcloud.app.domain.repository.ClinicalDocumentRepository;
 import com.medcloud.app.domain.repository.PatientRepository;
-import com.medcloud.app.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import jakarta.persistence.EntityManager; // Importamos EntityManager
+import jakarta.persistence.EntityManager;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,7 @@ public class ClinicalDocumentServiceImpl {
     private final ClinicalDocumentRepository documentRepository;
     private final ClinicalDocumentMapper documentMapper;
     private final PatientRepository patientRepository;
-    private final UserRepository userRepository; // Se mantiene, aunque lo usaremos menos
-    private final EntityManager entityManager; // 🚨 ¡Nuevo: Inyección de EntityManager!
+    private final EntityManager entityManager;
 
     /**
      * Calcula el tamaño binario real (en bytes) a partir de una cadena Base64.
@@ -46,51 +46,81 @@ public class ClinicalDocumentServiceImpl {
 
     @Transactional
     public ClinicalDocumentDto uploadDocument(ClinicalDocumentCreateRequest requestDto) {
-        // 1. Validar y obtener entidades de clave foránea
+        // 1. Buscar o crear paciente por cédula
+        PatientEntity patient = findOrCreatePatient(requestDto);
 
-        // Normalización a minúsculas para robustez del UUID
-        String patientIdString = requestDto.getPatientId().toLowerCase();
-        String userIdString = requestDto.getUploadedByUserId().toLowerCase();
-
-        UUID patientUuid;
-        UUID userUuid;
+        // 2. Validar y obtener EPS
+        String epsIdString = requestDto.getUploadedByEpsId().toLowerCase();
+        UUID epsUuid;
         try {
-            patientUuid = UUID.fromString(patientIdString);
-            userUuid = UUID.fromString(userIdString);
+            epsUuid = UUID.fromString(epsIdString);
         } catch (IllegalArgumentException e) {
-            throw new InvalidUuidException("UUID inválido proporcionado: " + e.getMessage());
+            throw new InvalidUuidException("UUID de EPS inválido: " + e.getMessage());
         }
 
-        // 🚨 CAMBIO DE ESTRATEGIA: Uso de EntityManager.find() para forzar la lectura DB.
-        // Esto ignora el caché de nivel 1 de Hibernate que podría estar obsoleto.
-
-        // Buscar Paciente
-        PatientEntity patient = entityManager.find(PatientEntity.class, patientUuid);
-        if (patient == null) {
-            throw new ResourceNotFoundException("Paciente con ID " + patientUuid + " no encontrado");
+        EpsEntity eps = entityManager.find(EpsEntity.class, epsUuid);
+        if (eps == null) {
+            throw new ResourceNotFoundException("EPS con ID " + epsUuid + " no encontrada");
         }
 
-        // Buscar Usuario
-        UserEntity user = entityManager.find(UserEntity.class, userUuid);
-        if (user == null) {
-            throw new ResourceNotFoundException("Usuario con ID " + userUuid + " no encontrado");
-        }
-
-        // 2. Mapear DTO a Entidad
+        // 3. Mapear DTO a Entidad
         ClinicalDocument document = documentMapper.toEntity(requestDto);
 
-        // 3. Asignar relaciones y metadatos calculados
+        // 4. Asignar relaciones y metadatos calculados
         document.setPatient(patient);
-        document.setUploadedBy(user);
+        document.setUploadedBy(eps);
+
+        // Asignar datos del médico
+        document.setDoctorName(requestDto.getDoctorName());
+        document.setDoctorDocumentNumber(requestDto.getDoctorDocumentNumber());
+        document.setDoctorSpecialty(requestDto.getDoctorSpecialty());
 
         long calculatedSize = calculateBinarySizeBytes(requestDto.getFileContentBase64());
         document.setSizeBytes(calculatedSize);
 
-        // 4. Guardar en la DB
+        // 5. Guardar en la DB
         ClinicalDocument savedDocument = documentRepository.save(document);
 
-        // 5. Mapear y devolver el DTO de salida
+        // 6. Mapear y devolver el DTO de salida
         return documentMapper.toDto(savedDocument);
+    }
+
+    /**
+     * Busca un paciente por cédula, si no existe lo crea con los datos del request.
+     * Valida que no haya conflicto con otras EPS si el diagnóstico está en curso.
+     */
+    private PatientEntity findOrCreatePatient(ClinicalDocumentCreateRequest requestDto) {
+        Optional<PatientEntity> existingPatient = patientRepository.findByDocumentNumber(requestDto.getPatientDocumentNumber());
+
+        if (existingPatient.isPresent()) {
+            PatientEntity patient = existingPatient.get();
+
+            // Si el paciente ya existe y tiene diagnóstico en curso, verificar que sea la misma EPS
+            if (patient.isDiagnosisInProgress()) {
+                // Verificar si alguna EPS ya tiene este paciente en tratamiento
+                // Para una implementación completa, necesitaríamos una tabla de relación EPS-Paciente
+                // Por ahora, lanzamos excepción si ya está en curso
+                throw new PatientAlreadyInProgressException("El paciente ya tiene un diagnóstico en curso con otra EPS");
+            }
+
+            // Actualizar datos del paciente si es necesario
+            patient.setFullName(requestDto.getPatientFullName());
+            patient.setBirthDate(requestDto.getPatientBirthDate());
+            patient.setTreatment(requestDto.getPatientTreatment());
+            patient.setDiagnosisInProgress(requestDto.getPatientDiagnosisInProgress());
+
+            return patientRepository.save(patient);
+        }
+
+        // Crear nuevo paciente
+        PatientEntity newPatient = new PatientEntity();
+        newPatient.setDocumentNumber(requestDto.getPatientDocumentNumber());
+        newPatient.setFullName(requestDto.getPatientFullName());
+        newPatient.setBirthDate(requestDto.getPatientBirthDate());
+        newPatient.setTreatment(requestDto.getPatientTreatment());
+        newPatient.setDiagnosisInProgress(requestDto.getPatientDiagnosisInProgress());
+
+        return patientRepository.save(newPatient);
     }
 
     /**
@@ -111,17 +141,17 @@ public class ClinicalDocumentServiceImpl {
     }
 
     /**
-     * Obtiene todos los documentos clínicos asociados a un paciente.
+     * Obtiene todos los documentos clínicos asociados a un paciente por su cédula.
      */
-    public List<ClinicalDocumentDto> getDocumentsByPatientId(String patientIdString) {
-        UUID patientUuid;
-        try {
-            patientUuid = UUID.fromString(patientIdString);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidUuidException("UUID inválido proporcionado: " + e.getMessage());
+    public List<ClinicalDocumentDto> getDocumentsByPatientDocumentNumber(String documentNumber) {
+        Optional<PatientEntity> patientOpt = patientRepository.findByDocumentNumber(documentNumber);
+
+        if (patientOpt.isEmpty()) {
+            return List.of(); // Retorna lista vacía si el paciente no existe
         }
 
-        List<ClinicalDocument> documents = documentRepository.findByPatientId(patientUuid);
+        PatientEntity patient = patientOpt.get();
+        List<ClinicalDocument> documents = documentRepository.findByPatientId(patient.getId());
 
         return documentMapper.toDtoList(documents);
     }

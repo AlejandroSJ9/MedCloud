@@ -24,4 +24,14 @@ public class PatientRepositoryImp implements PatientRepository {
     public Optional<PatientEntity> findById(UUID uuid) {
         return jpaPatient.findById(uuid);
     }
+
+    @Override
+    public Optional<PatientEntity> findByDocumentNumber(String documentNumber) {
+        return jpaPatient.findByDocumentNumber(documentNumber);
+    }
+
+    @Override
+    public PatientEntity save(PatientEntity patient) {
+        return jpaPatient.save(patient);
+    }
 }

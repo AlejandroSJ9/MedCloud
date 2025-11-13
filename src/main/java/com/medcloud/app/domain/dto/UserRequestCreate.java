@@ -14,9 +14,6 @@ public record UserRequestCreate(
         String documentNumber,
         String fullName,
         LocalDate birthDate,
-        // Campos de Doctor
-        String specialty,
-        String licenseNumber,
         //Campos de paciente
         Integer weight
 ) {
