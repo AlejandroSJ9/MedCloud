@@ -155,4 +155,12 @@ public class ClinicalDocumentServiceImpl {
 
         return documentMapper.toDtoList(documents);
     }
+
+    /**
+     * Obtiene todos los documentos clínicos asociados a un paciente por su UUID.
+     */
+    public List<ClinicalDocumentDto> getDocumentsByPatientId(UUID patientId) {
+        List<ClinicalDocument> documents = documentRepository.findByPatientId(patientId);
+        return documentMapper.toDtoList(documents);
+    }
 }
