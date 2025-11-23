@@ -1,5 +1,6 @@
 package com.medcloud.app.domain.service;
 
+import com.medcloud.app.domain.dto.EpsCreateRequest;
 import com.medcloud.app.domain.dto.UserRequestCreate;
 import com.medcloud.app.domain.dto.UserResponse;
 import com.medcloud.app.domain.enums.RoleName;
@@ -52,6 +53,30 @@ public class EpsService {
         EpsEntity toSave = this.userRepositoryImp.save(epsBase);
         return this.userMapper.toResponse(toSave);
 
+    }
+
+    public UserResponse saveEps(EpsCreateRequest request){
+        if(this.userRepositoryImp.existByEmail(request.email())){
+            throw new UserAlreadyExistException("user already exist");
+        }
+
+        EpsEntity epsEntity = userMapper.toEpsEntity(request);
+        epsEntity.setPasswordHash(passwordHasher.hash(request.password()));
+
+        // Assign EPS role
+        Optional<RoleEntity> existingRole = jpaRole.findByName(RoleName.EPS);
+        RoleEntity role;
+        if (existingRole.isPresent()) {
+            role = existingRole.get();
+        } else {
+            role = new RoleEntity();
+            role.setName(RoleName.EPS);
+            role = jpaRole.save(role);
+        }
+        epsEntity.getRoles().add(role);
+
+        EpsEntity saved = this.userRepositoryImp.save(epsEntity);
+        return this.userMapper.toResponse(saved);
     }
 
     public void updateRole(String email, RoleName newRole) {
