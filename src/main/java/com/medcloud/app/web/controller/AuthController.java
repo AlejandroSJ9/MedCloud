@@ -62,13 +62,13 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("token", response.getToken(), "email", response.getEmail(), "role", response.getRole()));
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Unauthorized");
-            error.put("message", "Invalid credentials: The provided identifier or password is incorrect.");
+            error.put("error", "No autorizado");
+            error.put("message", "Credenciales invalidas: El correo o la contraseña proporcionados son incorrectos.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Unauthorized");
-            error.put("message", "User not found: No account exists with the provided identifier.");
+            error.put("error", "No autorizado");
+            error.put("message", "Usuario no encontrado: No existe ninguna cuenta con el identificador proporcionado.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
@@ -89,7 +89,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } else {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Patient not found");
+            error.put("error", "Paciente No Encontrado");
             error.put("message", "Ningún Paciente Encontrado Con Número de Documento.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }

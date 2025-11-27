@@ -24,9 +24,11 @@ public class ClinicalDocumentCreateRequest {
     @NotBlank(message = "La cédula del paciente es requerida.")
     String patientDocumentNumber;
 
+    @NotNull(message = "El nombre completo del paciente es requerido.")
     @Size(max=120, message = "El nombre no puede exceder los 120 caracteres.")
     String patientFullName;
 
+    @NotNull(message = "La fecha de nacimiento del paciente es requerida.")
     LocalDate patientBirthDate;
 
     @Size(max=1000, message = "El tratamiento no puede exceder los 1000 caracteres.")

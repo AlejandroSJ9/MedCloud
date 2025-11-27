@@ -13,6 +13,7 @@ import com.medcloud.app.domain.repository.ClinicalDocumentRepository;
 import com.medcloud.app.domain.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.medcloud.app.domain.service.AdresValidationService;
 import com.medcloud.app.domain.dto.EpsValidationResponseDTO;
@@ -24,6 +25,7 @@ import jakarta.persistence.EntityManager;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClinicalDocumentServiceImpl {
 
     private final ClinicalDocumentRepository documentRepository;
@@ -95,8 +97,10 @@ public class ClinicalDocumentServiceImpl {
      * Busca un paciente por cédula, si no existe lo crea con los datos del request.
      * Valida que no haya conflicto con otras EPS si el diagnóstico está en curso.
      */
-    private PatientEntity findOrCreatePatient(ClinicalDocumentCreateRequest requestDto) {
-        Optional<PatientEntity> existingPatient = patientRepository.findByDocumentNumber(requestDto.getPatientDocumentNumber());
+     private PatientEntity findOrCreatePatient(ClinicalDocumentCreateRequest requestDto) {
+         log.info("Finding or creating patient for document number: {}", requestDto.getPatientDocumentNumber());
+         log.info("Patient birth date from request: {}", requestDto.getPatientBirthDate());
+         Optional<PatientEntity> existingPatient = patientRepository.findByDocumentNumber(requestDto.getPatientDocumentNumber());
 
         if (existingPatient.isPresent()) {
             PatientEntity patient = existingPatient.get();
@@ -130,6 +134,7 @@ public class ClinicalDocumentServiceImpl {
         }
 
         // Crear nuevo paciente
+        log.info("Creating new patient with birth date: {}", requestDto.getPatientBirthDate());
         PatientEntity newPatient = new PatientEntity();
         newPatient.setDocumentNumber(requestDto.getPatientDocumentNumber());
         newPatient.setFullName(requestDto.getPatientFullName());
