@@ -14,6 +14,8 @@ import com.medcloud.app.domain.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.medcloud.app.domain.service.AdresValidationService;
+import com.medcloud.app.domain.dto.EpsValidationResponseDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,7 @@ public class ClinicalDocumentServiceImpl {
     private final ClinicalDocumentMapper documentMapper;
     private final PatientRepository patientRepository;
     private final EntityManager entityManager;
+    private final AdresValidationService adresValidationService;
 
     /**
      * Calcula el tamaño binario real (en bytes) a partir de una cadena Base64.
@@ -46,6 +49,9 @@ public class ClinicalDocumentServiceImpl {
 
     @Transactional
     public ClinicalDocumentDto uploadDocument(ClinicalDocumentCreateRequest requestDto) {
+        // Note: EPS validation is now performed separately in the frontend before upload
+        // This method assumes validation has already been completed
+
         // 1. Buscar o crear paciente por cédula
         PatientEntity patient = findOrCreatePatient(requestDto);
 
@@ -97,10 +103,15 @@ public class ClinicalDocumentServiceImpl {
 
             // Si el paciente ya existe y tiene diagnóstico en curso, verificar que sea la misma EPS
             if (patient.isDiagnosisInProgress()) {
-                // Verificar si alguna EPS ya tiene este paciente en tratamiento
-                // Para una implementación completa, necesitaríamos una tabla de relación EPS-Paciente
-                // Por ahora, lanzamos excepción si ya está en curso
-                throw new PatientAlreadyInProgressException("El paciente ya tiene un diagnóstico en curso con otra EPS");
+                // Verificar si la EPS actual ya ha subido documentos para este paciente
+                List<ClinicalDocument> existingDocuments = documentRepository.findByPatientId(patient.getId());
+                boolean hasCurrentEpsUploaded = existingDocuments.stream()
+                    .anyMatch(doc -> doc.getUploadedBy().getId().equals(UUID.fromString(requestDto.getUploadedByEpsId())));
+
+                if (!hasCurrentEpsUploaded) {
+                    throw new PatientAlreadyInProgressException("El paciente ya tiene un diagnóstico en curso con otra EPS");
+                }
+                // Si la EPS actual ya ha subido documentos, permitir la subida
             }
 
             // Actualizar datos del paciente si es necesario (solo si se proporcionan)

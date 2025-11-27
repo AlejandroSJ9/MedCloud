@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/patient-login", "/auth/patient-access", "/users/").permitAll() // Endpoints públicos
                         .requestMatchers("/clinical-documents/patient/**", "/clinical-documents/patient/uuid/**").permitAll() // Consulta de documentos por cédula o UUID (público)
+                        .requestMatchers("/validation/eps/**").permitAll() // Endpoints de validación EPS (públicos para captcha)
                         .requestMatchers("/clinical-documents/**").authenticated() // Otros endpoints requieren autenticación
                         .anyRequest().authenticated()
                 )

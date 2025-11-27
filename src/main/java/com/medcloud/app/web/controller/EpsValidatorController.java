@@ -25,10 +25,16 @@ public class EpsValidatorController {
     public ResponseEntity<CaptchaResponseDTO> initiateValidation(
             @RequestParam String tipoDocumento,
             @RequestParam String numeroDocumento) {
+        System.out.println("=== INITIATE CAPTCHA REQUEST ===");
+        System.out.println("tipoDocumento: " + tipoDocumento);
+        System.out.println("numeroDocumento: " + numeroDocumento);
         try {
             CaptchaResponseDTO response = adresValidationService.initiateValidation(tipoDocumento, numeroDocumento);
+            System.out.println("Captcha response: " + response);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.out.println("Error in initiateValidation: " + e.getMessage());
+            e.printStackTrace();
             // In case of unexpected errors, return a generic error response
             CaptchaResponseDTO errorResponse = new CaptchaResponseDTO(null, null, "Internal server error: " + e.getMessage());
             return ResponseEntity.internalServerError().body(errorResponse);
@@ -56,6 +62,32 @@ public class EpsValidatorController {
         } catch (Exception e) {
             // In case of unexpected errors, return a generic error response
             EpsValidationResponseDTO errorResponse = new EpsValidationResponseDTO(false, null, null, null, "Internal server error: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
+    /**
+     * Validates patient data with ADRES without uploading the document.
+     * Used for frontend validation before upload confirmation.
+     *
+     * @param sessionId the session ID from initiation
+     * @param tipoDocumento the document type
+     * @param numeroDocumento the document number
+     * @param captchaSolution the captcha solution
+     * @return ResponseEntity containing EpsValidationResponseDTO with patient info
+     */
+    @PostMapping("/validate-patient")
+    public ResponseEntity<EpsValidationResponseDTO> validatePatientData(
+            @RequestParam String sessionId,
+            @RequestParam String tipoDocumento,
+            @RequestParam String numeroDocumento,
+            @RequestParam String captchaSolution) {
+        try {
+            EpsValidationResponseDTO response = adresValidationService.validateEps(sessionId, captchaSolution, tipoDocumento, numeroDocumento);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // In case of unexpected errors, return a generic error response
+            EpsValidationResponseDTO errorResponse = new EpsValidationResponseDTO(false, null, null, null, "Error validating patient data: " + e.getMessage());
             return ResponseEntity.internalServerError().body(errorResponse);
         }
     }

@@ -30,6 +30,7 @@ public class ClinicalDocumentController {
      * Requiere rol EPS. Si el paciente no existe, se crea automáticamente.
      */
     @PostMapping
+ 
     @PreAuthorize("hasRole('EPS')")
     public ResponseEntity<ClinicalDocumentDto> uploadDocument(@Valid @RequestBody ClinicalDocumentCreateRequest request) {
         ClinicalDocumentDto savedDocument = clinicalDocumentService.uploadDocument(request);

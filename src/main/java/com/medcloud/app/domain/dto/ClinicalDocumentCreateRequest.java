@@ -18,6 +18,9 @@ import java.time.LocalDate;
 public class ClinicalDocumentCreateRequest {
 
     // Datos del paciente (para crear si no existe)
+    @NotBlank(message = "El tipo de documento del paciente es requerido.")
+    String patientDocumentType;
+
     @NotBlank(message = "La cédula del paciente es requerida.")
     String patientDocumentNumber;
 
@@ -60,4 +63,11 @@ public class ClinicalDocumentCreateRequest {
 
     @Min(value = 1, message = "El tamaño del archivo debe ser mayor a 0 bytes.")
     long sizeBytes; // El servicio recalculará esto para el tamaño binario real
+
+    // Campos para validación de captcha con Adres
+    @NotBlank(message = "El sessionId del captcha es requerido.")
+    String captchaSessionId;
+
+    @NotBlank(message = "La solución del captcha es requerida.")
+    String captchaSolution;
 }
