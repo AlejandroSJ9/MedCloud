@@ -21,6 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.medcloud.app.domain.dto.PatientResponse;
+import com.medcloud.app.domain.service.PatientService;
+import com.medcloud.app.persistence.entity.PatientEntity;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -31,6 +35,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final EpsService epsService;
     private final com.medcloud.app.security.JwtUtil jwtUtil;
+    private final PatientService patientService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -65,6 +70,28 @@ public class AuthController {
             error.put("error", "Unauthorized");
             error.put("message", "User not found: No account exists with the provided identifier.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+    }
+
+    @PostMapping("/patient-login")
+    public ResponseEntity<?> patientLogin(@RequestParam String documentNumber) {
+        Optional<PatientEntity> patientOpt = patientService.findByDocumentNumber(documentNumber);
+        if (patientOpt.isPresent()) {
+            PatientEntity patient = patientOpt.get();
+            PatientResponse response = new PatientResponse(
+                patient.getId(),
+                patient.getDocumentNumber(),
+                patient.getFullName(),
+                patient.getBirthDate(),
+                patient.getTreatment(),
+                patient.isDiagnosisInProgress()
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Patient not found");
+            error.put("message", "Ningún Paciente Encontrado Con Número de Documento.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
 

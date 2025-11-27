@@ -20,13 +20,11 @@ public class PatientEntity extends BaseId {
     @Column(name = "document_number", unique = true)
     private String documentNumber;
 
-    @NotBlank
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "full_name", nullable = true)
     @Size(max=120)
     private String fullName;
 
-    @NotNull
-    @Column(name = "birth_date", nullable = false)
+    @Column(name = "birth_date", nullable = true)
     private LocalDate birthDate;
 
     @Column(name = "treatment", columnDefinition = "TEXT")

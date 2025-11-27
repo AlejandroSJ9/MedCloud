@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller REST para la gestión de documentos clínicos.
@@ -29,6 +30,7 @@ public class ClinicalDocumentController {
      * Requiere rol EPS. Si el paciente no existe, se crea automáticamente.
      */
     @PostMapping
+ 
     @PreAuthorize("hasRole('EPS')")
     public ResponseEntity<ClinicalDocumentDto> uploadDocument(@Valid @RequestBody ClinicalDocumentCreateRequest request) {
         ClinicalDocumentDto savedDocument = clinicalDocumentService.uploadDocument(request);
@@ -54,6 +56,21 @@ public class ClinicalDocumentController {
     public ResponseEntity<List<ClinicalDocumentDto>> getDocumentsByPatientDocumentNumber(@PathVariable String documentNumber) {
         List<ClinicalDocumentDto> documents = clinicalDocumentService.getDocumentsByPatientDocumentNumber(documentNumber);
         return ResponseEntity.ok(documents);
+    }
+
+    /**
+     * Obtiene todos los documentos clínicos asociados a un paciente (por su UUID).
+     * Endpoint público para que pacientes puedan consultar sus documentos sin autenticación.
+     */
+    @GetMapping("/patient/uuid/{patientId}")
+    public ResponseEntity<List<ClinicalDocumentDto>> getDocumentsByPatientId(@PathVariable String patientId) {
+        try {
+            java.util.UUID uuid = java.util.UUID.fromString(patientId);
+            List<ClinicalDocumentDto> documents = clinicalDocumentService.getDocumentsByPatientId(uuid);
+            return ResponseEntity.ok(documents);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // Nota: Es recomendable añadir un ControllerAdvice para manejar la ResourceNotFoundException (404).

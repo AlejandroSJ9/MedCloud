@@ -18,14 +18,15 @@ import java.time.LocalDate;
 public class ClinicalDocumentCreateRequest {
 
     // Datos del paciente (para crear si no existe)
+    @NotBlank(message = "El tipo de documento del paciente es requerido.")
+    String patientDocumentType;
+
     @NotBlank(message = "La cédula del paciente es requerida.")
     String patientDocumentNumber;
 
-    @NotBlank(message = "El nombre completo del paciente es requerido.")
     @Size(max=120, message = "El nombre no puede exceder los 120 caracteres.")
     String patientFullName;
 
-    @NotNull(message = "La fecha de nacimiento del paciente es requerida.")
     LocalDate patientBirthDate;
 
     @Size(max=1000, message = "El tratamiento no puede exceder los 1000 caracteres.")
@@ -39,14 +40,12 @@ public class ClinicalDocumentCreateRequest {
     String uploadedByEpsId;
 
     // Datos del médico que carga la historia clínica
-    @NotBlank(message = "El nombre del médico es requerido.")
     @Size(max=120, message = "El nombre del médico no puede exceder los 120 caracteres.")
     String doctorName;
 
     @NotBlank(message = "La cédula del médico es requerida.")
     String doctorDocumentNumber;
 
-    @Size(max=60, message = "La especialidad del médico no puede exceder los 60 caracteres.")
     String doctorSpecialty;
 
     @NotNull(message = "El tipo de documento es requerido.")
@@ -64,4 +63,11 @@ public class ClinicalDocumentCreateRequest {
 
     @Min(value = 1, message = "El tamaño del archivo debe ser mayor a 0 bytes.")
     long sizeBytes; // El servicio recalculará esto para el tamaño binario real
+
+    // Campos para validación de captcha con Adres
+    @NotBlank(message = "El sessionId del captcha es requerido.")
+    String captchaSessionId;
+
+    @NotBlank(message = "La solución del captcha es requerida.")
+    String captchaSolution;
 }
